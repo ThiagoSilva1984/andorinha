@@ -30,11 +30,6 @@ public class TestUsuarioRepository {
 	@Before 
 	public void setup() {
 		DatabaseHelper.getInstance("andorinhaDS").execute("dataset/andorinha.xml", DatabaseOperation.CLEAN_INSERT);
-		/* o que essa operação faz?
-		 * 0 CLEAN_INSERT vai deletar tudo e vai inserir de novo
-		 * o dbUnit quando deletar tudo, ele deleta de baixo para cima e depois vai inserir um por dos registros que estão em andorinha.xml
-		 */
-		// this.usuarioRepository = new UsuarioRepository(); --esse codigo com NEW não funciona mais por causa do EJB
 	}
 
 	@Test
@@ -89,8 +84,6 @@ public class TestUsuarioRepository {
 		usuarios = this.usuarioRepository.listarTodos();
 		
 		assertThat( usuarios ).isNotNull();
-		
-		usuarios.forEach(u -> System.out.println(u.getId() + " - " + u.getNome()));
 	}
 	
 
