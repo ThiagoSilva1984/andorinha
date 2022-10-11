@@ -24,12 +24,13 @@ public class ComentarioRepository extends AbstractCrudRepository {
 	public void inserir(Comentario comentario) throws ErroAoconectarNaBaseException, ErroAoConsultarBaseException {
 		try (Connection c = super.ds.getConnection()) {
 			int id = this.recuperaProximoValorDaSequence("seq_comentario");
-
+			comentario.setId(id); 
+			
 			Calendar hoje = Calendar.getInstance();
 
 			PreparedStatement ps = c.prepareStatement(
 					"insert into comentario (id, id_usuario, id_tweet, conteudo, data_postagem) values (?,?,?,?,?)");
-			ps.setInt(1, id);
+			ps.setInt(1, comentario.getId());
 			ps.setInt(2, comentario.getUsuario().getId());
 			ps.setInt(3, comentario.getTweet().getId());
 			ps.setString(4, comentario.getConteudo());
@@ -45,9 +46,12 @@ public class ComentarioRepository extends AbstractCrudRepository {
 
 	public void atualizar(Comentario comentario) throws ErroAoconectarNaBaseException, ErroAoConsultarBaseException {
 		try (Connection c = super.ds.getConnection()) {
-			PreparedStatement ps = c.prepareStatement("UPDATE comentario SET conteudo = ?  WHERE id = ?");
+			Calendar hoje = Calendar.getInstance();
+			
+			PreparedStatement ps = c.prepareStatement("UPDATE comentario SET conteudo = ?, data_postagem = ?  WHERE id = ?");
 			ps.setString(1, comentario.getConteudo());
-			ps.setInt(2, comentario.getId());
+			ps.setTimestamp(2, new Timestamp(hoje.getTimeInMillis()));
+			ps.setInt(3, comentario.getId());
 			ps.execute();
 			ps.close();
 
@@ -74,8 +78,7 @@ public class ComentarioRepository extends AbstractCrudRepository {
 
 			StringBuilder sql = new StringBuilder();
 			sql.append("SELECT c.id, c.conteudo, c.data_postagem, c.id_usuario, c.id_tweet, ");
-			sql.append(
-					"u.nome as nome_usuario, t.conteudo as conteudo_tweet, t.data_postagem as data_postagem_tweet, ");
+			sql.append("u.nome as nome_usuario, t.conteudo as conteudo_tweet, t.data_postagem as data_postagem_tweet, ");
 			sql.append("t.id_usuario as id_usuario_tweet, ut.nome as nome_usuario_tweet ");
 			sql.append("FROM comentario c ");
 			sql.append("JOIN tweet t on c.id_tweet = t.id ");
@@ -88,27 +91,27 @@ public class ComentarioRepository extends AbstractCrudRepository {
 			ResultSet rs = ps.executeQuery();
 
 			if (rs.next()) { // se veio o resultado
-				Usuario usuario = new Usuario();
-				usuario.setId(rs.getInt("id_usuario"));
-				usuario.setNome(rs.getString("nome_usuario"));
+				Usuario usuarioTweet = new Usuario();
+				usuarioTweet.setId(rs.getInt("id_usuario_tweet"));
+				usuarioTweet.setNome(rs.getString("nome_usuario_tweet"));
 
 				Tweet tweet = new Tweet();
 				tweet.setId(rs.getInt("id_tweet"));
 				tweet.setConteudo(rs.getString("conteudo_tweet"));
-				Calendar data = new GregorianCalendar();
-				data.setTime(rs.getTimestamp("data_postagem_tweet"));
-				tweet.setData_postagem(data);
-				tweet.setUsuario(usuario);
+				Calendar dataTweet = new GregorianCalendar();
+				dataTweet.setTime(rs.getTimestamp("data_postagem_tweet"));
+				tweet.setData_postagem(dataTweet);
+				tweet.setUsuario(usuarioTweet);
 
 				comentario = new Comentario();
 				comentario.setId(rs.getInt("id"));
 				comentario.setTweet(tweet);
-				comentario.setUsuario(usuario);
-				comentario.setConteudo("conteudo");
+				comentario.setUsuario(usuarioTweet);
+				comentario.setConteudo(rs.getString("conteudo"));
 
-				Calendar data2 = new GregorianCalendar();
-				data2.setTime(rs.getTimestamp("data_postagem"));
-				comentario.setData(data2);
+				Calendar dataComentario = new GregorianCalendar();
+				dataComentario.setTime(rs.getTimestamp("data_postagem"));
+				comentario.setData(dataComentario);
 			}
 			rs.close();
 			ps.close();
@@ -119,16 +122,28 @@ public class ComentarioRepository extends AbstractCrudRepository {
 			throw new ErroAoConsultarBaseException("Ocorreu um erro ao consultar comentario", e);
 		}
 	}
+	
+//	public List<Comentario> pesquisar(ComentarioSeletor seletor) throws ErroAoConsultarBaseException, ErroAoConectarNaBaseException {
+//		
+//		//listar os comentarios, filtrando pelos campos do seletor
+//
+//		return null;
+//	}
+//
+//	public Long contar(ComentarioSeletor seletor) throws ErroAoConsultarBaseException, ErroAoConectarNaBaseException {
+//	
+//		//listar os comentarios, filtrando pelos campos do seletor
+//
+//		return 0L;
+//	}
 
 	public List<Comentario> listarTodos() throws ErroAoconectarNaBaseException, ErroAoConsultarBaseException {
 		try (Connection c = super.ds.getConnection()) {
-
 			List<Comentario> comentarios = new ArrayList<Comentario>();
 
 			StringBuilder sql = new StringBuilder();
 			sql.append("SELECT c.id, c.conteudo, c.data_postagem, c.id_usuario, c.id_tweet, ");
-			sql.append(
-					"u.nome as nome_usuario, t.conteudo as conteudo_tweet, t.data_postagem as data_postagem_tweet, ");
+			sql.append("u.nome as nome_usuario, t.conteudo as conteudo_tweet, t.data_postagem as data_postagem_tweet, ");
 			sql.append("t.id_usuario as id_usuario_tweet, ut.nome as nome_usuario_tweet ");
 			sql.append("FROM comentario c ");
 			sql.append("JOIN tweet t on c.id_tweet = t.id ");
@@ -139,26 +154,27 @@ public class ComentarioRepository extends AbstractCrudRepository {
 			ResultSet rs = ps.executeQuery();
 
 			while (rs.next()) {
-				Usuario usuario = new Usuario();
-				usuario.setId(rs.getInt("id_usuario_tweet"));
-				usuario.setNome(rs.getString("nome_usuario_tweet"));
+				Usuario usuarioTweet = new Usuario();
+				usuarioTweet.setId(rs.getInt("id_usuario_tweet"));
+				usuarioTweet.setNome(rs.getString("nome_usuario_tweet"));
 
-				Calendar data = new GregorianCalendar();
-				data.setTime(rs.getTimestamp("data_postagem_tweet"));
+				Calendar dataTweet = new GregorianCalendar();
+				dataTweet.setTime(rs.getTimestamp("data_postagem_tweet"));
 
 				Tweet tweet = new Tweet();
 				tweet.setId(rs.getInt("id_tweet"));
 				tweet.setConteudo(rs.getString("conteudo_tweet"));
-				tweet.setData_postagem(data);
-				tweet.setUsuario(null);
+				tweet.setData_postagem(dataTweet);
+				tweet.setUsuario(usuarioTweet);
 
-				data.setTime(rs.getTimestamp("data_postagem"));
+				Calendar dataComnetario = new GregorianCalendar();
+				dataComnetario.setTime(rs.getTimestamp("data_postagem"));
 
 				Comentario comentario = new Comentario();
 				comentario.setId(rs.getInt("id"));
-				comentario.setData(data);
+				comentario.setData(dataComnetario);
 				comentario.setConteudo(rs.getString("conteudo"));
-				comentario.setUsuario(usuario);
+				comentario.setUsuario(usuarioTweet);
 				comentario.setTweet(tweet);
 
 				comentarios.add(comentario);

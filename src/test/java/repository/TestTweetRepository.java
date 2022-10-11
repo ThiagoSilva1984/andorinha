@@ -47,7 +47,7 @@ public class TestTweetRepository {
 		Usuario usuario = this.usuarioRepository.consultar(ID_USUARIO_CONSULTA);
 		
 		Tweet tweet = new Tweet();
-		tweet.setConteudo("Postagem para teste de inserção");
+		tweet.setConteudo(POSTAGEM_ATUALIZADA_TWEET);
 		tweet.setUsuario(usuario);
 		
 		this.tweetRepository.inserir(tweet);
@@ -72,7 +72,7 @@ public class TestTweetRepository {
 	}
 
 	@Test
-	public void testa_atualizar_tweet() throws ErroAoconectarNaBaseException, ErroAoConsultarBaseException {
+	public void testa_alterar_tweet() throws ErroAoconectarNaBaseException, ErroAoConsultarBaseException {
 		Tweet tweet = this.tweetRepository.consultar(ID_TWEET_CONSULTA);
 		tweet.setConteudo("Postagem Atualizada/Alterada");
 

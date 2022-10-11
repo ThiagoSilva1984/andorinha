@@ -23,7 +23,6 @@ public class TweetRepository extends AbstractCrudRepository {
 	public void inserir(Tweet tweet) throws ErroAoconectarNaBaseException, ErroAoConsultarBaseException {
 		try (Connection c = super.ds.getConnection()) {
 			int id = this.recuperaProximoValorDaSequence("seq_tweet");
-
 			tweet.setId(id);
 
 			Calendar hoje = Calendar.getInstance();
@@ -95,6 +94,7 @@ public class TweetRepository extends AbstractCrudRepository {
 				Usuario usuario = new Usuario();
 				usuario.setId(rs.getInt("id_usuario"));
 				usuario.setNome(rs.getString("nome"));
+				
 				tweet.setUsuario(usuario);
 			}
 			rs.close();
