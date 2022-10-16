@@ -1,192 +1,167 @@
 package repository;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 import javax.ejb.Stateless;
+import javax.persistence.Query;
 
 import model.Comentario;
-import model.Tweet;
-import model.Usuario;
 import model.exceptions.ErroAoConsultarBaseException;
 import model.exceptions.ErroAoconectarNaBaseException;
+import model.seletor.ComentarioSeletor;
 
 @Stateless
 public class ComentarioRepository extends AbstractCrudRepository {
 
-	public void inserir(Comentario comentario) throws ErroAoconectarNaBaseException, ErroAoConsultarBaseException {
-		try (Connection c = super.ds.getConnection()) {
-			int id = this.recuperaProximoValorDaSequence("seq_comentario");
-			comentario.setId(id); 
-			
-			Calendar hoje = Calendar.getInstance();
-
-			PreparedStatement ps = c.prepareStatement(
-					"insert into comentario (id, id_usuario, id_tweet, conteudo, data_postagem) values (?,?,?,?,?)");
-			ps.setInt(1, comentario.getId());
-			ps.setInt(2, comentario.getUsuario().getId());
-			ps.setInt(3, comentario.getTweet().getId());
-			ps.setString(4, comentario.getConteudo());
-			ps.setTimestamp(5, new Timestamp(hoje.getTimeInMillis()));
-
-			ps.execute();
-			ps.close();
-
-		} catch (SQLException e) {
-			throw new ErroAoConsultarBaseException("Ocorreu um erro ao inserir comentario", e);
-		}
+	public void inserir(Comentario comentario) {
+		comentario.setData(Calendar.getInstance());
+		super.em.persist(comentario);
 	}
 
-	public void atualizar(Comentario comentario) throws ErroAoconectarNaBaseException, ErroAoConsultarBaseException {
-		try (Connection c = super.ds.getConnection()) {
-			Calendar hoje = Calendar.getInstance();
-			
-			PreparedStatement ps = c.prepareStatement("UPDATE comentario SET conteudo = ?, data_postagem = ?  WHERE id = ?");
-			ps.setString(1, comentario.getConteudo());
-			ps.setTimestamp(2, new Timestamp(hoje.getTimeInMillis()));
-			ps.setInt(3, comentario.getId());
-			ps.execute();
-			ps.close();
-
-		} catch (SQLException e) {
-			throw new ErroAoConsultarBaseException("Ocorreu um erro ao atualizar comentário", e);
-		}
+	public void atualizar(Comentario comentario) {
+		comentario.setData(Calendar.getInstance());
+		super.em.merge(comentario);
 	}
 
 	public void remover(int id) throws ErroAoConsultarBaseException, ErroAoconectarNaBaseException {
-		try (Connection c = super.ds.getConnection()) {
-			PreparedStatement ps = c.prepareStatement("DELETE FROM comentario WHERE id = ?");
-			ps.setInt(1, id);
-			ps.execute();
-			ps.close();
-
-		} catch (SQLException e) {
-			throw new ErroAoConsultarBaseException("Ocorreu um erro ao deletar comentário", e);
-		}
+		Comentario comentario = this.consultar(id);
+		super.em.remove(comentario);
 	}
 
 	public Comentario consultar(int id) throws ErroAoconectarNaBaseException, ErroAoConsultarBaseException {
-		try (Connection c = super.ds.getConnection()) {
-			Comentario comentario = null;
+		return super.em.find(Comentario.class, id);
+	}
 
-			StringBuilder sql = new StringBuilder();
-			sql.append("SELECT c.id, c.conteudo, c.data_postagem, c.id_usuario, c.id_tweet, ");
-			sql.append("u.nome as nome_usuario, t.conteudo as conteudo_tweet, t.data_postagem as data_postagem_tweet, ");
-			sql.append("t.id_usuario as id_usuario_tweet, ut.nome as nome_usuario_tweet ");
-			sql.append("FROM comentario c ");
-			sql.append("JOIN tweet t on c.id_tweet = t.id ");
-			sql.append("JOIN usuario u on c.id_usuario = u.id ");
-			sql.append("JOIN usuario ut on t.id_usuario = ut.id ");
-			sql.append("WHERE c.id = ? ");
+	public List<Comentario> listarTodos() {
+		ComentarioSeletor seletor = new ComentarioSeletor();
+		List<Comentario> comentarios = this.pesquisar(seletor);
 
-			PreparedStatement ps = c.prepareStatement(sql.toString());
-			ps.setInt(1, id);
-			ResultSet rs = ps.executeQuery();
+		return comentarios;
+	}
 
-			if (rs.next()) { // se veio o resultado
-				Usuario usuarioTweet = new Usuario();
-				usuarioTweet.setId(rs.getInt("id_usuario_tweet"));
-				usuarioTweet.setNome(rs.getString("nome_usuario_tweet"));
+	public List<Comentario> pesquisar(ComentarioSeletor seletor) {
+		StringBuilder jpql = new StringBuilder();
+		jpql.append("SELECT c FROM Comentario c ");
 
-				Tweet tweet = new Tweet();
-				tweet.setId(rs.getInt("id_tweet"));
-				tweet.setConteudo(rs.getString("conteudo_tweet"));
-				Calendar dataTweet = new GregorianCalendar();
-				dataTweet.setTime(rs.getTimestamp("data_postagem_tweet"));
-				tweet.setData_postagem(dataTweet);
-				tweet.setUsuario(usuarioTweet);
+		this.criarFiltro(jpql, seletor);
 
-				comentario = new Comentario();
-				comentario.setId(rs.getInt("id"));
-				comentario.setTweet(tweet);
-				comentario.setUsuario(usuarioTweet);
-				comentario.setConteudo(rs.getString("conteudo"));
+		Query query = super.em.createQuery(jpql.toString());
 
-				Calendar dataComentario = new GregorianCalendar();
-				dataComentario.setTime(rs.getTimestamp("data_postagem"));
-				comentario.setData(dataComentario);
+		this.adicionarParametros(query, seletor);
+
+		return query.getResultList();
+	}
+
+	private void criarFiltro(StringBuilder jpql, ComentarioSeletor seletor) {
+
+		if (seletor.possuiFiltro()) {
+			jpql.append("WHERE ");
+			boolean primeiro = true;
+
+			// pesquisa por id do comentario
+			if (seletor.getId() != null) {
+				jpql.append("c.id = :id ");
+				primeiro = false;
 			}
-			rs.close();
-			ps.close();
 
-			return comentario;
+			// pesquisa por uma palavra no comentário
+			if (seletor.getConteudo() != null && !seletor.getConteudo().trim().isEmpty()) {
+				if (!primeiro) {
+					jpql.append("AND ");
+				}
+				jpql.append("c.conteudo like :conteudo ");
+				primeiro = false;
+			}
 
-		} catch (SQLException e) {
-			throw new ErroAoConsultarBaseException("Ocorreu um erro ao consultar comentario", e);
+			// pesquisa por comentários feitos em uma data especifica
+			if (seletor.getData() != null && seletor.getData_final() == null) {
+				if (!primeiro) {
+					jpql.append("AND ");
+				}
+
+				jpql.append("c.data_postagem = :data ");
+				primeiro = false;
+			}
+
+			// pesquisa por comentários feitos em um periodo
+			if (seletor.getData() != null && seletor.getData_final() != null) {
+				if (!primeiro) {
+					jpql.append("AND ");
+				}
+				jpql.append("c.data_postagem BETWEEN :data AND :data_final ");
+				primeiro = false;
+			}
+
+			// pesquisa por comentários feitos por um id usuário
+			if (seletor.getIdUsuario() != null) {
+				if (!primeiro) {
+					jpql.append("AND ");
+				}
+
+				jpql.append("c.usuario.id = :id_usuario ");
+				primeiro = false;
+			}
+
+			// pesqtisa comentarios pelo id tweet
+			if (seletor.getIdTweet() != null) {
+				if (!primeiro) {
+					jpql.append("AND ");
+				}
+
+				jpql.append("c.tweet.id = :id_tweet ");
+				primeiro = false;
+			}
 		}
 	}
-	
-//	public List<Comentario> pesquisar(ComentarioSeletor seletor) throws ErroAoConsultarBaseException, ErroAoConectarNaBaseException {
-//		
-//		//listar os comentarios, filtrando pelos campos do seletor
-//
-//		return null;
-//	}
-//
-//	public Long contar(ComentarioSeletor seletor) throws ErroAoConsultarBaseException, ErroAoConectarNaBaseException {
-//	
-//		//listar os comentarios, filtrando pelos campos do seletor
-//
-//		return 0L;
-//	}
 
-	public List<Comentario> listarTodos() throws ErroAoconectarNaBaseException, ErroAoConsultarBaseException {
-		try (Connection c = super.ds.getConnection()) {
-			List<Comentario> comentarios = new ArrayList<Comentario>();
+	private void adicionarParametros(Query query, ComentarioSeletor seletor) {
 
-			StringBuilder sql = new StringBuilder();
-			sql.append("SELECT c.id, c.conteudo, c.data_postagem, c.id_usuario, c.id_tweet, ");
-			sql.append("u.nome as nome_usuario, t.conteudo as conteudo_tweet, t.data_postagem as data_postagem_tweet, ");
-			sql.append("t.id_usuario as id_usuario_tweet, ut.nome as nome_usuario_tweet ");
-			sql.append("FROM comentario c ");
-			sql.append("JOIN tweet t on c.id_tweet = t.id ");
-			sql.append("JOIN usuario u on c.id_usuario = u.id ");
-			sql.append("JOIN usuario ut on t.id_usuario = ut.id ");
+		if (seletor.possuiFiltro()) {
 
-			PreparedStatement ps = c.prepareStatement(sql.toString());
-			ResultSet rs = ps.executeQuery();
-
-			while (rs.next()) {
-				Usuario usuarioTweet = new Usuario();
-				usuarioTweet.setId(rs.getInt("id_usuario_tweet"));
-				usuarioTweet.setNome(rs.getString("nome_usuario_tweet"));
-
-				Calendar dataTweet = new GregorianCalendar();
-				dataTweet.setTime(rs.getTimestamp("data_postagem_tweet"));
-
-				Tweet tweet = new Tweet();
-				tweet.setId(rs.getInt("id_tweet"));
-				tweet.setConteudo(rs.getString("conteudo_tweet"));
-				tweet.setData_postagem(dataTweet);
-				tweet.setUsuario(usuarioTweet);
-
-				Calendar dataComnetario = new GregorianCalendar();
-				dataComnetario.setTime(rs.getTimestamp("data_postagem"));
-
-				Comentario comentario = new Comentario();
-				comentario.setId(rs.getInt("id"));
-				comentario.setData(dataComnetario);
-				comentario.setConteudo(rs.getString("conteudo"));
-				comentario.setUsuario(usuarioTweet);
-				comentario.setTweet(tweet);
-
-				comentarios.add(comentario);
+			if (seletor.getId() != null) {
+				query.setParameter("id", seletor.getId());
 			}
-			rs.close();
-			ps.close();
 
-			return comentarios;
+			if (seletor.getConteudo() != null && !seletor.getConteudo().trim().isEmpty()) {
+				query.setParameter("conteudo", String.format("%%%s%%", seletor.getConteudo()));
+			}
 
-		} catch (SQLException e) {
-			throw new ErroAoConsultarBaseException("Ocorreu um erro ao listar comentários", e);
+			if (seletor.getData() != null) {
+				query.setParameter("data", seletor.getData());
+			}
+
+			if (seletor.getIdUsuario() != null) {
+				query.setParameter("id_usuario", seletor.getIdUsuario());
+			}
+
+			if (seletor.getIdTweet() != null) {
+				query.setParameter("id_tweet", seletor.getIdTweet());
+			}
+
+			if (seletor.getDataTweet() != null) {
+				query.setParameter("data", seletor.getDataTweet());
+			}
+
+			if (seletor.getData() != null && seletor.getData_final() != null) {
+				query.setParameter("data", seletor.getData());
+				query.setParameter("data_final", seletor.getData_final());
+			}
 		}
+	}
+
+	public Long contar(ComentarioSeletor seletor) {
+
+		StringBuilder jpql = new StringBuilder();
+		jpql.append("SELECT COUNT(c) FROM Comentario c ");
+
+		this.criarFiltro(jpql, seletor);
+
+		Query query = super.em.createQuery(jpql.toString());
+
+		this.adicionarParametros(query, seletor);
+
+		return (Long) query.getSingleResult();
 	}
 
 }

@@ -1,105 +1,98 @@
 package repository;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.ejb.Stateless;
+import javax.persistence.Query;
 
 import model.Usuario;
 import model.exceptions.ErroAoConsultarBaseException;
 import model.exceptions.ErroAoconectarNaBaseException;
+import model.seletor.UsuarioSeletor;
 
 @Stateless
 public class UsuarioRepository extends AbstractCrudRepository {
 
-	public void inserir(Usuario usuario) throws ErroAoconectarNaBaseException, ErroAoConsultarBaseException {
-		try (Connection c = super.ds.getConnection()) {
-			int id = this.recuperaProximoValorDaSequence("seq_usuario");
-			usuario.setId(id);
-
-			PreparedStatement ps = c.prepareStatement("insert into usuario (id, nome) values (?, ?)");
-			ps.setInt(1, usuario.getId());
-			ps.setString(2, usuario.getNome());
-			ps.execute();
-			ps.close();
-
-		} catch (SQLException e) {
-			throw new ErroAoConsultarBaseException("Ocorreu um erro ao inserir usuário", e);
-		}
+	public void inserir(Usuario usuario) {
+		super.em.persist(usuario);
 	}
 
-	public void atualizar(Usuario usuario) throws ErroAoconectarNaBaseException, ErroAoConsultarBaseException {
-		try (Connection c = super.ds.getConnection()) {
-			PreparedStatement ps = c.prepareStatement("UPDATE usuario SET nome = ?  WHERE id = ?");
-			ps.setString(1, usuario.getNome());
-			ps.setInt(2, usuario.getId());
-			ps.execute();
-			ps.close();
-
-		} catch (SQLException e) {
-			throw new ErroAoConsultarBaseException("Ocorreu um erro ao atualizar usuario", e);
-		}
+	public void atualizar(Usuario usuario) {
+		super.em.merge(usuario);
 	}
 
 	public void remover(int id) throws ErroAoConsultarBaseException, ErroAoconectarNaBaseException {
-		try (Connection c = super.ds.getConnection()) {
-			PreparedStatement ps = c.prepareStatement("delete from usuario where id = ?");
-			ps.setInt(1, id);
-			ps.execute();
-			ps.close();
+		Usuario user = this.consultar(id);
+		super.em.remove(user);
+	}
 
-		} catch (SQLException e) {
-			throw new ErroAoConsultarBaseException("Ocorreu um erro ao deletar usuario", e);
+	public Usuario consultar(int id) {
+		return super.em.find(Usuario.class, id);
+	}
+
+	public List<Usuario> listarTodos() {
+		return this.pesquisar(new UsuarioSeletor());
+	}
+
+	public List<Usuario> pesquisar(UsuarioSeletor seletor) {
+
+		StringBuilder jpql = new StringBuilder();
+		jpql.append("SELECT u FROM Usuario u ");
+
+		this.criarFiltro(jpql, seletor);
+
+		Query query = super.em.createQuery(jpql.toString());
+
+		this.adicionarParamentros(query, seletor);
+
+		return query.getResultList();
+	}
+
+	private void criarFiltro(StringBuilder jpql, UsuarioSeletor seletor) {
+		if (seletor.possuiFiltro()) {
+			jpql.append("WHERE ");
+			boolean primeiro = true;
+
+			if (seletor.getId() != null) {
+				jpql.append("u.id = :id ");
+				primeiro = false;
+			}
+
+			if (seletor.getNome() != null && !seletor.getNome().trim().isEmpty()) {
+				if (!primeiro) {
+					jpql.append("AND ");
+				}
+				jpql.append("u.nome like :nome ");
+				primeiro = false;
+			}
 		}
 	}
 
-	public Usuario consultar(int id) throws ErroAoconectarNaBaseException, ErroAoConsultarBaseException {
-		try (Connection c = super.ds.getConnection()) {
-			Usuario user = null;
+	private void adicionarParamentros(Query query, UsuarioSeletor seletor) {
 
-			PreparedStatement ps = c.prepareStatement("select id, nome from usuario where id = ? ");
-			ps.setInt(1, id);
-			ResultSet rs = ps.executeQuery();
-			if (rs.next()) {
-				user = new Usuario();
-				user.setId(rs.getInt("id"));
-				user.setNome(rs.getString("nome"));
+		if (seletor.possuiFiltro()) {
+			if (seletor.getId() != null) {
+				query.setParameter("id", seletor.getId());
 			}
-			rs.close();
-			ps.close();
 
-			return user;
-
-		} catch (SQLException e) {
-			throw new ErroAoConsultarBaseException("Ocorreu um erro ao consultar usuario", e);
+			if (seletor.getNome() != null && !seletor.getNome().trim().isEmpty()) {
+				query.setParameter("nome", String.format("%%%s%%", seletor.getNome()));
+			}
 		}
 	}
 
-	public List<Usuario> listarTodos() throws ErroAoconectarNaBaseException, ErroAoConsultarBaseException {
-		try (Connection c = super.ds.getConnection()) {
-			List<Usuario> usuarios = new ArrayList<Usuario>();
+	public Long contar(UsuarioSeletor seletor) {
 
-			PreparedStatement ps = c.prepareStatement("select * from usuario");
-			ResultSet rs = ps.executeQuery();
+		StringBuilder jpql = new StringBuilder();
+		jpql.append("SELECT COUNT(u) FROM Usuario u ");
 
-			while (rs.next()) {
-				Usuario usuario = new Usuario();
-				usuario.setId(rs.getInt("id"));
-				usuario.setNome(rs.getString("nome"));
-				usuarios.add(usuario);
-			}
-			rs.close();
-			ps.close();
+		this.criarFiltro(jpql, seletor);
 
-			return usuarios;
+		Query query = super.em.createQuery(jpql.toString());
 
-		} catch (SQLException e) {
-			throw new ErroAoConsultarBaseException("Ocorreu um erro ao listar usuarios", e);
-		}
+		this.adicionarParamentros(query, seletor);
+
+		return (Long) query.getSingleResult();
 	}
 
 }
