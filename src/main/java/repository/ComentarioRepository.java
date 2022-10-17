@@ -15,21 +15,21 @@ import model.seletor.ComentarioSeletor;
 public class ComentarioRepository extends AbstractCrudRepository {
 
 	public void inserir(Comentario comentario) {
-		comentario.setData(Calendar.getInstance());
+		comentario.setDataPostagem(Calendar.getInstance());
 		super.em.persist(comentario);
 	}
 
 	public void atualizar(Comentario comentario) {
-		comentario.setData(Calendar.getInstance());
+		comentario.setDataPostagem(Calendar.getInstance());
 		super.em.merge(comentario);
 	}
 
-	public void remover(int id) throws ErroAoConsultarBaseException, ErroAoconectarNaBaseException {
+	public void remover(int id) {
 		Comentario comentario = this.consultar(id);
 		super.em.remove(comentario);
 	}
 
-	public Comentario consultar(int id) throws ErroAoconectarNaBaseException, ErroAoConsultarBaseException {
+	public Comentario consultar(int id) {
 		return super.em.find(Comentario.class, id);
 	}
 
@@ -75,21 +75,21 @@ public class ComentarioRepository extends AbstractCrudRepository {
 			}
 
 			// pesquisa por comentários feitos em uma data especifica
-			if (seletor.getData() != null && seletor.getData_final() == null) {
+			if (seletor.getDataPostagem() != null) {
 				if (!primeiro) {
 					jpql.append("AND ");
 				}
 
-				jpql.append("c.data_postagem = :data ");
+				jpql.append("c.dataPostagem = :dataPostagem ");
 				primeiro = false;
 			}
 
 			// pesquisa por comentários feitos em um periodo
-			if (seletor.getData() != null && seletor.getData_final() != null) {
+			if (seletor.getDataPostagemInicial() != null && seletor.getDataPostagemFinal() != null) {
 				if (!primeiro) {
 					jpql.append("AND ");
 				}
-				jpql.append("c.data_postagem BETWEEN :data AND :data_final ");
+				jpql.append("c.dataPostagem BETWEEN :dataPostagemInicial AND :dataPostagemFinal ");
 				primeiro = false;
 			}
 
@@ -99,7 +99,7 @@ public class ComentarioRepository extends AbstractCrudRepository {
 					jpql.append("AND ");
 				}
 
-				jpql.append("c.usuario.id = :id_usuario ");
+				jpql.append("c.usuario.id = :idUsuario ");
 				primeiro = false;
 			}
 
@@ -109,7 +109,7 @@ public class ComentarioRepository extends AbstractCrudRepository {
 					jpql.append("AND ");
 				}
 
-				jpql.append("c.tweet.id = :id_tweet ");
+				jpql.append("c.tweet.id = :idTweet ");
 				primeiro = false;
 			}
 		}
@@ -118,7 +118,8 @@ public class ComentarioRepository extends AbstractCrudRepository {
 	private void adicionarParametros(Query query, ComentarioSeletor seletor) {
 
 		if (seletor.possuiFiltro()) {
-
+			
+			//Query do id comentário
 			if (seletor.getId() != null) {
 				query.setParameter("id", seletor.getId());
 			}
@@ -127,25 +128,25 @@ public class ComentarioRepository extends AbstractCrudRepository {
 				query.setParameter("conteudo", String.format("%%%s%%", seletor.getConteudo()));
 			}
 
-			if (seletor.getData() != null) {
-				query.setParameter("data", seletor.getData());
+			if (seletor.getDataPostagemInicial() != null && seletor.getDataPostagemFinal() == null) {
+				query.setParameter("dataPostagemInicial", seletor.getDataPostagemInicial());
 			}
 
 			if (seletor.getIdUsuario() != null) {
-				query.setParameter("id_usuario", seletor.getIdUsuario());
+				query.setParameter("idUsuario", seletor.getIdUsuario());
 			}
 
 			if (seletor.getIdTweet() != null) {
-				query.setParameter("id_tweet", seletor.getIdTweet());
+				query.setParameter("idTweet", seletor.getIdTweet());
 			}
 
-			if (seletor.getDataTweet() != null) {
-				query.setParameter("data", seletor.getDataTweet());
+			if (seletor.getDataPostagem() != null) {
+				query.setParameter("dataPostagem", seletor.getDataPostagem());
 			}
 
-			if (seletor.getData() != null && seletor.getData_final() != null) {
-				query.setParameter("data", seletor.getData());
-				query.setParameter("data_final", seletor.getData_final());
+			if (seletor.getDataPostagemInicial() != null && seletor.getDataPostagemFinal() != null) {
+				query.setParameter("dataPostagemInicial", seletor.getDataPostagemInicial());
+				query.setParameter("dataPostagemFinal", seletor.getDataPostagemFinal());
 			}
 		}
 	}

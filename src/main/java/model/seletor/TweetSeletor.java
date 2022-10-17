@@ -6,8 +6,8 @@ public class TweetSeletor {
 
 	private Integer id;
 	private String conteudo;
-	private Calendar data_postagem;
-	private Calendar data_postagem_final;
+	private Calendar dataPostagemInicial;
+	private Calendar dataPostagemFinal;
 	private Integer idUsuario;
 
 	private Integer limite;
@@ -16,9 +16,9 @@ public class TweetSeletor {
 	public boolean possuiFiltro() {
 		return ( this.id != null ) || 
 			   ( this.conteudo != null && !this.conteudo.trim().isEmpty() ) ||
-			   ( this.getData_postagem() != null ) ||
+			   ( this.getDataPostagemInicial() != null ) ||
 			   ( this.getIdUsuario() != null ) ||
-			   ( this.getData_postagem_final() != null );
+			   ( this.getDataPostagemFinal() != null );
 	}
 
 	public boolean possuiPaginacao() {
@@ -41,12 +41,12 @@ public class TweetSeletor {
 		this.conteudo = conteudo;
 	}
 
-	public Calendar getData_postagem() {
-		return data_postagem;
+	public Calendar getDataPostagemInicial() {
+		return dataPostagemInicial;
 	}
 
-	public void setData_postagem(Calendar data_postagem) {
-		this.data_postagem = data_postagem;
+	public void setDataPostagemInicial(Calendar dataPostagem) {
+		this.dataPostagemInicial = dataPostagem;
 	}
 
 	public Integer getIdUsuario() {
@@ -57,12 +57,12 @@ public class TweetSeletor {
 		this.idUsuario = idUsuario;
 	}
 
-	public Calendar getData_postagem_final() {
-		return data_postagem_final;
+	public Calendar getDataPostagemFinal() {
+		return dataPostagemFinal;
 	}
 
-	public void setData_postagem_final(Calendar data_postagem_final) {
-		this.data_postagem_final = data_postagem_final;
+	public void setDataPostagemFinal(Calendar dataPostagemFinal) {
+		this.dataPostagemFinal = dataPostagemFinal;
 	}
 
 	public Integer getLimite() {

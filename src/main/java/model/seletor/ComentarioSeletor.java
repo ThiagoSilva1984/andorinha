@@ -6,11 +6,11 @@ public class ComentarioSeletor {
 
 	private Integer id;
 	private String conteudo;
-	private Calendar data;
-	private Calendar data_final;
+	private Calendar dataPostagemInicial;
+	private Calendar dataPostagemFinal;
 	private Integer idUsuario;
 	private Integer idTweet;
-	private Calendar dataTweet;
+	private Calendar dataPostagem;
 
 	private Integer limite;
 	private Integer pagina; 
@@ -18,11 +18,11 @@ public class ComentarioSeletor {
 	public boolean possuiFiltro() {
 		return ( this.id != null ) || 
 			   ( this.conteudo != null && !this.conteudo.trim().isEmpty() ) ||
-			   ( this.data != null ) ||
-			   ( this.data_final != null ) ||
+			   ( this.dataPostagemInicial != null ) ||
+			   ( this.dataPostagemFinal != null ) ||
 			   ( this.idTweet != null ) ||
 			   ( this.idUsuario != null ) ||
-			   ( this.dataTweet != null);
+			   ( this.dataPostagem != null);
 	}
 	
 	public boolean possuiPaginacao() {
@@ -45,12 +45,12 @@ public class ComentarioSeletor {
 		this.conteudo = conteudo;
 	}
 
-	public Calendar getData() {
-		return data;
+	public Calendar getDataPostagemInicial() {
+		return dataPostagemInicial;
 	}
 
-	public void setData(Calendar data) {
-		this.data = data;
+	public void setDataPostagemInicial(Calendar dataInicial) {
+		this.dataPostagemInicial = dataInicial;
 	}
 
 	public Integer getIdUsuario() {
@@ -85,12 +85,12 @@ public class ComentarioSeletor {
 		this.pagina = pagina;
 	}
 
-	public Calendar getDataTweet() {
-		return dataTweet;
+	public Calendar getDataPostagem() {
+		return dataPostagem;
 	}
 
-	public void setDataTweet(Calendar dataTweet) {
-		this.dataTweet = dataTweet;
+	public void setDataPostagem(Calendar dataPostagem) {
+		this.dataPostagem = dataPostagem;
 	}
 
 	public Integer getLimite() {
@@ -101,12 +101,12 @@ public class ComentarioSeletor {
 		this.limite = limite;
 	}
 
-	public Calendar getData_final() {
-		return data_final;
+	public Calendar getDataPostagemFinal() {
+		return dataPostagemFinal;
 	}
 
-	public void setData_final(Calendar data_final) {
-		this.data_final = data_final;
+	public void setDataPostagemFinal(Calendar dataPostagemFinal) {
+		this.dataPostagemFinal = dataPostagemFinal;
 	}
 
 }

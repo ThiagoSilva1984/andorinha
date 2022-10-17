@@ -30,7 +30,7 @@ public class Comentario {
 
 	@Column(name = "data_postagem")
 	@Temporal(TemporalType.TIMESTAMP)
-	private Calendar data_postagem;
+	private Calendar dataPostagem;
 
 	@OneToOne
 	@JoinColumn(name = "id_usuario", referencedColumnName = "id")
@@ -56,12 +56,12 @@ public class Comentario {
 		this.conteudo = conteudo;
 	}
 
-	public Calendar getData() {
-		return data_postagem;
+	public Calendar getDataPostagem() {
+		return dataPostagem;
 	}
 
-	public void setData(Calendar data_postagem) {
-		this.data_postagem = data_postagem;
+	public void setDataPostagem(Calendar dataPostagem) {
+		this.dataPostagem = dataPostagem;
 	}
 
 	public Usuario getUsuario() {
@@ -84,7 +84,7 @@ public class Comentario {
 	public String toString() {
 		return "\nComentario Id: " + this.getId() 
 			 + "\n Conteudo: " + this.getConteudo() 
-			 + "\n Data: " + this.getData()
+			 + "\n Data: " + this.getDataPostagem()
 			 + "\n Usuario que comentou: " + this.getUsuario().getNome() 
 			 + "\n Tweet comentado: " + getTweet().getConteudo();
 	}

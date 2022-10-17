@@ -29,7 +29,7 @@ public class Tweet {
 
 	@Column(name = "data_postagem")
 	@Temporal(TemporalType.TIMESTAMP)
-	private Calendar data_postagem;
+	private Calendar dataPostagem;
 
 	@ManyToOne
 	@JoinColumn(name = "id_usuario", referencedColumnName = "id")
@@ -51,12 +51,12 @@ public class Tweet {
 		this.conteudo = conteudo;
 	}
 
-	public Calendar getData_postagem() {
-		return data_postagem;
+	public Calendar getDataPostagem() {
+		return dataPostagem;
 	}
 
-	public void setData_postagem(Calendar data_postagem) {
-		this.data_postagem = data_postagem;
+	public void setDataPostagem(Calendar dataPostagem) {
+		this.dataPostagem = dataPostagem;
 	}
 
 	public Usuario getUsuario() {
@@ -71,7 +71,7 @@ public class Tweet {
 	public String toString() {
 		return "\nTweet Id: " + this.getId() 
 		+ ", \ngetConteudo: " + this.getConteudo() 
-	   +", \nData postagem: " + this.getData_postagem() 
+	   +", \nData postagem: " + this.getDataPostagem() 
      		+ ", \nUsuario: " + this.getUsuario().getNome();
 	}
 

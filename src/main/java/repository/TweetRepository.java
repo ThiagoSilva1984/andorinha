@@ -13,12 +13,12 @@ import model.seletor.TweetSeletor;
 public class TweetRepository extends AbstractCrudRepository {
 
 	public void inserir(Tweet tweet) {
-		tweet.setData_postagem(Calendar.getInstance());
+		tweet.setDataPostagem(Calendar.getInstance());
 		super.em.persist(tweet);
 	}
 
 	public void atualizar(Tweet tweet) {
-		tweet.setData_postagem(Calendar.getInstance());
+		tweet.setDataPostagem(Calendar.getInstance());
 		super.em.merge(tweet);
 	}
 
@@ -68,19 +68,19 @@ public class TweetRepository extends AbstractCrudRepository {
 				primeiro = false;
 			}
 
-			if (seletor.getData_postagem() != null && seletor.getData_postagem_final() == null) {
+			if (seletor.getDataPostagemInicial() != null && seletor.getDataPostagemFinal() == null) {
 				if (!primeiro) {
 					jpql.append("AND ");
 				}
-				jpql.append("t.data_postagem = :data_postagem ");
+				jpql.append("t.dataPostagem = :dataPostagemInicial ");
 				primeiro = false;
 			}
 
-			if (seletor.getData_postagem() != null && seletor.getData_postagem_final() != null) {
+			if (seletor.getDataPostagemInicial() != null && seletor.getDataPostagemFinal() != null) {
 				if (!primeiro) {
 					jpql.append("AND ");
 				}
-				jpql.append("t.data_postagem BETWEEN :data_postagem AND :data_postagem_final ");
+				jpql.append("t.dataPostagem BETWEEN :dataPostagemInicial AND :dataPostagemFinal ");
 				primeiro = false;
 			}
 		}
@@ -97,13 +97,13 @@ public class TweetRepository extends AbstractCrudRepository {
 				query.setParameter("conteudo", String.format("%%%s%%", seletor.getConteudo()));
 			}
 
-			if (seletor.getData_postagem() != null) {
-				query.setParameter("data_postagem", seletor.getData_postagem());
+			if (seletor.getDataPostagemInicial() != null) {
+				query.setParameter("dataPostagemInicial", seletor.getDataPostagemInicial());
 			}
 
-			if (seletor.getData_postagem() != null && seletor.getData_postagem_final() != null) {
-				query.setParameter("data_postagem", seletor.getData_postagem());
-				query.setParameter("data_postagem_final", seletor.getData_postagem_final());
+			if (seletor.getDataPostagemInicial() != null && seletor.getDataPostagemFinal() != null) {
+				query.setParameter("dataPostagemInicial", seletor.getDataPostagemInicial());
+				query.setParameter("dataPostagemFinal", seletor.getDataPostagemFinal());
 			}
 		}
 	}

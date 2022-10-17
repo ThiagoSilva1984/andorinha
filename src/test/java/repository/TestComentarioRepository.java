@@ -61,7 +61,7 @@ public class TestComentarioRepository {
 
 		assertThat(comentarioInserido.getId()).isGreaterThan(0);
 		assertThat(comentarioInserido).isNotNull();
-		assertThat(Calendar.getInstance().getTime()).isCloseTo(comentarioInserido.getData().getTime(), DELTA_MILIS);
+		assertThat(Calendar.getInstance().getTime()).isCloseTo(comentarioInserido.getDataPostagem().getTime(), DELTA_MILIS);
 
 		System.out.println(comentario);
 	}
@@ -92,7 +92,7 @@ public class TestComentarioRepository {
 		assertThat(alterado).isNotNull();
 		assertThat(alterado.getId()).isEqualTo(ID_COMENTARIO_CONSULTA);
 		assertThat(alterado.getConteudo()).isEqualTo(comentario.getConteudo());
-		assertThat(Calendar.getInstance().getTime()).isCloseTo(alterado.getData().getTime(), DELTA_MILIS);
+		assertThat(Calendar.getInstance().getTime()).isCloseTo(alterado.getDataPostagem().getTime(), DELTA_MILIS);
 
 		System.out.println(comentario);
 	}
@@ -122,7 +122,7 @@ public class TestComentarioRepository {
 				"Comentário 7", "Comentário 8", "Comentário 9", "Comentário 10");
 
 		comentarios.stream().forEach(c -> {
-			assertThat(c.getData()).isNotNull().isLessThan(Calendar.getInstance());
+			assertThat(c.getDataPostagem()).isNotNull().isLessThan(Calendar.getInstance());
 			assertThat(c.getUsuario()).isNotNull();
 			assertThat(c.getTweet()).isNotNull();
 			assertThat(c.getTweet().getUsuario()).isNotNull();
@@ -142,7 +142,7 @@ public class TestComentarioRepository {
 
 		comentarios.stream().forEach(c -> {
 			assertThat(c.getId()).isEqualTo(ID_COMENTARIO_CONSULTA);
-			assertThat(c.getData()).isNotNull().isLessThan(Calendar.getInstance());
+			assertThat(c.getDataPostagem()).isNotNull().isLessThan(Calendar.getInstance());
 			assertThat(c.getUsuario()).isNotNull();
 			assertThat(c.getTweet()).isNotNull();
 			assertThat(c.getTweet().getUsuario()).isNotNull();
@@ -160,7 +160,7 @@ public class TestComentarioRepository {
 		List<Comentario> comentarios = this.comentarioRepository.pesquisar(seletor);
 
 		comentarios.stream().forEach(c -> {
-			assertThat(c.getData()).isNotNull().isLessThan(Calendar.getInstance());
+			assertThat(c.getDataPostagem()).isNotNull().isLessThan(Calendar.getInstance());
 			assertThat(c.getUsuario()).isNotNull();
 			assertThat(c.getTweet()).isNotNull();
 			assertThat(c.getTweet().getUsuario()).isNotNull();
@@ -175,12 +175,12 @@ public class TestComentarioRepository {
 		Comentario comentario = this.comentarioRepository.consultar(3);
 
 		ComentarioSeletor seletor = new ComentarioSeletor();
-		seletor.setData(comentario.getData());
+		seletor.setDataPostagem(comentario.getDataPostagem());
 
 		List<Comentario> comentarios = this.comentarioRepository.pesquisar(seletor);
 
 		comentarios.stream().forEach(c -> {
-			assertThat(c.getData()).isNotNull().isLessThan(Calendar.getInstance());
+			assertThat(c.getDataPostagem()).isNotNull().isLessThan(Calendar.getInstance());
 			assertThat(c.getUsuario()).isNotNull();
 			assertThat(c.getTweet()).isNotNull();
 			assertThat(c.getTweet().getUsuario()).isNotNull();
@@ -195,13 +195,13 @@ public class TestComentarioRepository {
 		Comentario comentario2 = this.comentarioRepository.consultar(5);
 
 		ComentarioSeletor seletor = new ComentarioSeletor();
-		seletor.setData(comentario.getData());
-		seletor.setData_final(comentario2.getData());
+		seletor.setDataPostagemInicial(comentario.getDataPostagem());
+		seletor.setDataPostagemFinal(comentario2.getDataPostagem());
 
 		List<Comentario> comentarios = this.comentarioRepository.pesquisar(seletor);
 
 		comentarios.stream().forEach(c -> {
-			assertThat(c.getData()).isNotNull().isLessThan(Calendar.getInstance());
+			assertThat(c.getDataPostagem()).isNotNull().isLessThan(Calendar.getInstance());
 			assertThat(c.getUsuario()).isNotNull();
 			assertThat(c.getTweet()).isNotNull();
 			assertThat(c.getTweet().getUsuario()).isNotNull();
@@ -219,7 +219,7 @@ public class TestComentarioRepository {
 		List<Comentario> comentarios = this.comentarioRepository.pesquisar(seletor);
 
 		comentarios.stream().forEach(c -> {
-			assertThat(c.getData()).isNotNull().isLessThan(Calendar.getInstance());
+			assertThat(c.getDataPostagem()).isNotNull().isLessThan(Calendar.getInstance());
 			assertThat(c.getUsuario()).isNotNull();
 			assertThat(c.getTweet()).isNotNull();
 			assertThat(c.getTweet().getUsuario()).isNotNull();
@@ -240,7 +240,7 @@ public class TestComentarioRepository {
 		List<Comentario> comentarios = this.comentarioRepository.pesquisar(seletor);
 
 		comentarios.stream().forEach(c -> {
-			assertThat(c.getData()).isNotNull().isLessThan(Calendar.getInstance());
+			assertThat(c.getDataPostagem()).isNotNull().isLessThan(Calendar.getInstance());
 			assertThat(c.getUsuario()).isNotNull();
 			assertThat(c.getTweet()).isNotNull();
 			assertThat(c.getTweet().getUsuario()).isNotNull();
@@ -258,12 +258,12 @@ public class TestComentarioRepository {
 		ComentarioSeletor seletor = new ComentarioSeletor();
 		seletor.setIdUsuario(4);
 		seletor.setIdTweet(1);
-		seletor.setData(comentario.getData());
+		seletor.setDataPostagem(comentario.getDataPostagem());
 
 		List<Comentario> comentarios = this.comentarioRepository.pesquisar(seletor);
 
 		comentarios.stream().forEach(c -> {
-			assertThat(c.getData()).isNotNull().isLessThan(Calendar.getInstance());
+			assertThat(c.getDataPostagem()).isNotNull().isLessThan(Calendar.getInstance());
 			assertThat(c.getUsuario()).isNotNull();
 			assertThat(c.getTweet()).isNotNull();
 			assertThat(c.getTweet().getUsuario()).isNotNull();
@@ -306,7 +306,7 @@ public class TestComentarioRepository {
 		Comentario comentario = this.comentarioRepository.consultar(1); // vai dar o usuário de id 4
 
 		ComentarioSeletor seletor = new ComentarioSeletor();
-		seletor.setData(comentario.getData());
+		seletor.setDataPostagem(comentario.getDataPostagem());
 
 		long comentarios = this.comentarioRepository.contar(seletor);
 

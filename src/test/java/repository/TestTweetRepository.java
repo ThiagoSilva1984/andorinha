@@ -57,7 +57,7 @@ public class TestTweetRepository {
 
 		assertThat(inserido).isNotNull();
 		assertThat(inserido.getConteudo()).isEqualTo(tweet.getConteudo());
-		assertThat(Calendar.getInstance().getTime()).isCloseTo(inserido.getData_postagem().getTime(), DELTA_MILIS);
+		assertThat(Calendar.getInstance().getTime()).isCloseTo(inserido.getDataPostagem().getTime(), DELTA_MILIS);
 
 		System.out.println(tweet);
 	}
@@ -87,7 +87,7 @@ public class TestTweetRepository {
 
 		assertThat(alterado.getConteudo()).isNotNull();
 		assertThat(alterado.getConteudo()).isEqualTo(tweet.getConteudo());
-		assertThat(Calendar.getInstance().getTime()).isCloseTo(alterado.getData_postagem().getTime(), DELTA_MILIS);
+		assertThat(Calendar.getInstance().getTime()).isCloseTo(alterado.getDataPostagem().getTime(), DELTA_MILIS);
 
 		System.out.println(tweet);
 	}
@@ -116,7 +116,7 @@ public class TestTweetRepository {
 				"Minha postagem de teste 1", "Minha postagem de teste 2", "Minha postagem de teste 3");
 
 		tweets.stream().forEach(t -> {
-			assertThat(t.getData_postagem()).isNotNull().isLessThan(Calendar.getInstance());
+			assertThat(t.getDataPostagem()).isNotNull().isLessThan(Calendar.getInstance());
 			assertThat(t.getUsuario()).isNotNull();
 			System.out.println(t);
 		});
@@ -135,7 +135,7 @@ public class TestTweetRepository {
 		tweets.stream().forEach(t -> {
 			assertThat(t.getId()).isNotNull();
 			assertThat(t.getConteudo()).isNotNull();
-			assertThat(t.getData_postagem()).isNotNull().isLessThan(Calendar.getInstance());
+			assertThat(t.getDataPostagem()).isNotNull().isLessThan(Calendar.getInstance());
 			assertThat(t.getUsuario()).isNotNull();
 			System.out.println(t);
 		});
@@ -154,7 +154,7 @@ public class TestTweetRepository {
 		tweets.stream().forEach(t -> {
 			assertThat(t.getId()).isNotNull();
 			assertThat(t.getConteudo()).isNotNull();
-			assertThat(t.getData_postagem()).isNotNull().isLessThan(Calendar.getInstance());
+			assertThat(t.getDataPostagem()).isNotNull().isLessThan(Calendar.getInstance());
 			assertThat(t.getUsuario()).isNotNull();
 			System.out.println(t);
 		});
@@ -166,7 +166,7 @@ public class TestTweetRepository {
 		Tweet tweet = this.tweetRepository.consultar(1);
 
 		TweetSeletor seletor = new TweetSeletor();
-		seletor.setData_postagem(tweet.getData_postagem());
+		seletor.setDataPostagemInicial(tweet.getDataPostagem());
 
 		List<Tweet> tweets = this.tweetRepository.pesquisar(seletor);
 
@@ -175,7 +175,7 @@ public class TestTweetRepository {
 		tweets.stream().forEach(t -> {
 			assertThat(t.getId()).isNotNull();
 			assertThat(t.getConteudo()).isNotNull();
-			assertThat(t.getData_postagem()).isNotNull().isLessThan(Calendar.getInstance());
+			assertThat(t.getDataPostagem()).isNotNull().isLessThan(Calendar.getInstance());
 			assertThat(t.getUsuario()).isNotNull();
 			System.out.println(t);
 		});
@@ -187,8 +187,8 @@ public class TestTweetRepository {
 		Tweet tweet = this.tweetRepository.consultar(2);
 		Tweet tweet3 = this.tweetRepository.consultar(3);
 		TweetSeletor seletor = new TweetSeletor();
-		seletor.setData_postagem(tweet3.getData_postagem());
-		seletor.setData_postagem_final(tweet.getData_postagem());
+		seletor.setDataPostagemInicial(tweet3.getDataPostagem());
+		seletor.setDataPostagemFinal(tweet.getDataPostagem());
 
 		List<Tweet> tweets = this.tweetRepository.pesquisar(seletor);
 
@@ -197,7 +197,7 @@ public class TestTweetRepository {
 		tweets.stream().forEach(t -> {
 			assertThat(t.getId()).isNotNull();
 			assertThat(t.getConteudo()).isNotNull();
-			assertThat(t.getData_postagem()).isNotNull().isLessThan(Calendar.getInstance());
+			assertThat(t.getDataPostagem()).isNotNull().isLessThan(Calendar.getInstance());
 			assertThat(t.getUsuario()).isNotNull();
 			System.out.println(t);
 		});

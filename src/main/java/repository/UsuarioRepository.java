@@ -6,8 +6,6 @@ import javax.ejb.Stateless;
 import javax.persistence.Query;
 
 import model.Usuario;
-import model.exceptions.ErroAoConsultarBaseException;
-import model.exceptions.ErroAoconectarNaBaseException;
 import model.seletor.UsuarioSeletor;
 
 @Stateless
@@ -21,7 +19,7 @@ public class UsuarioRepository extends AbstractCrudRepository {
 		super.em.merge(usuario);
 	}
 
-	public void remover(int id) throws ErroAoConsultarBaseException, ErroAoconectarNaBaseException {
+	public void remover(int id) {
 		Usuario user = this.consultar(id);
 		super.em.remove(user);
 	}
