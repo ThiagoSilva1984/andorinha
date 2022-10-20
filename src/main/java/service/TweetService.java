@@ -11,23 +11,24 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.SecurityContext;
 
 import model.Tweet;
 import model.Usuario;
+import model.dto.TweetDTO;
 import model.seletor.TweetSeletor;
-import model.seletor.UsuarioSeletor;
 import repository.TweetRepository;
-import repository.UsuarioRepository;
 
 @Path("/tweet") //com isso, para acessar aqui tenho que colocar /api/usuario
 public class TweetService {
 	
 	@EJB
-	UsuarioRepository usuarioRepository;
-	
-	@EJB
 	TweetRepository tweetRepository;
+	
+	@Context
+	private SecurityContext context;
 	
 	//LISTAR TWEETS
 	@GET
@@ -41,6 +42,8 @@ public class TweetService {
 	@Consumes(MediaType.APPLICATION_JSON) // aqui estou dizendo: EU VOU RECEBER INFORMAÇÃO EM QUE FORMATO?
 	@Produces(MediaType.TEXT_PLAIN) // E eu vou produzir um texto, pq eu estou devolvendo um int, e não estou devolvendo um objeto
 	public int inserir(Tweet tweet) {
+		tweet.setUsuario( (Usuario) this.context.getUserPrincipal() );
+		
 		this.tweetRepository.inserir(tweet);
 		return tweet.getId();
 	}
@@ -76,6 +79,15 @@ public class TweetService {
 	@Produces(MediaType.APPLICATION_JSON) //sempre fazer o Produces
 	public List<Tweet> pesquisar( TweetSeletor seletor ){
 		return this.tweetRepository.pesquisar(seletor);
+	}
+	
+//	PESQUISAR TWEET-DTO
+	@POST
+	@Path("/dto")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON) //sempre fazer o Produces
+	public List<TweetDTO> pesquisarDTO( TweetSeletor seletor ){
+		return this.tweetRepository.pesquisarDTO(seletor);
 	}
 	
 

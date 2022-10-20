@@ -14,6 +14,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import model.Comentario;
+import model.dto.ComentarioDTO;
 import model.seletor.ComentarioSeletor;
 import repository.ComentarioRepository;
 
@@ -72,5 +73,13 @@ public class ComentarioService {
 		return this.comentarioRepository.pesquisar(seletor);
 	}
 	
+//	PESQUISAR DTO
+	@POST
+	@Path("/dto")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON) //sempre fazer o Produces
+	public List<ComentarioDTO> pesquisarDTO( ComentarioSeletor seletor ){
+		return this.comentarioRepository.pesquisarDTO(seletor);
+	}
 
 }

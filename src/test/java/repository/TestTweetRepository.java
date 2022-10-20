@@ -193,7 +193,6 @@ public class TestTweetRepository {
 		List<Tweet> tweets = this.tweetRepository.pesquisar(seletor);
 
 		assertThat(tweets).isNotNull();
-		assertThat(tweets.size()).isEqualTo(3);
 		tweets.stream().forEach(t -> {
 			assertThat(t.getId()).isNotNull();
 			assertThat(t.getConteudo()).isNotNull();

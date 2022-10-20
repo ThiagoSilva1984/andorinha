@@ -1,5 +1,7 @@
 package model;
 
+import java.security.Principal;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -8,9 +10,11 @@ import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity // tudo que é uma entidade é algo que eu posso salvar no banco de dados
 @Table(name = "usuario")
-public class Usuario {
+public class Usuario implements Principal{
 
 	@Id
 	@SequenceGenerator(name = "seq_usuario", sequenceName = "seq_usuario", initialValue = 1, allocationSize = 1)
@@ -20,15 +24,18 @@ public class Usuario {
 
 	@Column(name = "nome")
 	private String nome;
+	
+	@Column(name = "login")
+	private String login;
 
-//	@OneToMany(mappedBy = "usuario", fetch = FetchType.EAGER)
-//	private List<Tweet> tweets;
+	@Column(name = "senha")
+	private String senha;
 
-	public int getId() {
+	public Integer getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 
@@ -40,17 +47,31 @@ public class Usuario {
 		this.nome = nome;
 	}
 
-//	public List<Tweet> getTweets() {
-//		return tweets;
-//	}
-//
-//	public void setTweets(List<Tweet> tweets) {
-//		this.tweets = tweets;
-//	}
+	public String getSenha() {
+		return senha;
+	}
+
+	public void setSenha(String senha) {
+		this.senha = senha;
+	}
+	
+	public String getLogin() {
+		return login;
+	}
+
+	public void setLogin(String login) {
+		this.login = login;
+	}
 
 	@Override
 	public String toString() {
 		return "Id: " + this.getId() + ", Nome: " + this.getNome();
+	}
+
+	@JsonIgnore
+	@Override
+	public String getName() {
+		return this.login;
 	}
 
 }

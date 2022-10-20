@@ -22,7 +22,6 @@ import runner.DatabaseHelper;
 public class TestUsuarioRepository {
 
 	private static final int ID_USUARIO_CONSULTA = 5;
-	private static final int ID_USUARIO_SEM_TWEET = 1;
 
 	@EJB
 	private UsuarioRepository usuarioRepository;
@@ -178,7 +177,7 @@ public class TestUsuarioRepository {
 		seletor.setId(1);
 		Long total = this.usuarioRepository.contar(seletor);
 
-		assertThat(total).isNotNull().isEqualTo(1L);
+		assertThat(total).isNotNull().isEqualTo(1);
 
 		System.out.println(total);
 	}

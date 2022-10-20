@@ -10,6 +10,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
@@ -39,6 +41,12 @@ public class Comentario {
 	@ManyToOne
 	@JoinColumn(name = "id_tweet", referencedColumnName = "id")
 	private Tweet tweet;
+	
+	@PrePersist
+	@PreUpdate
+	public void preencheData() {
+		this.dataPostagem = Calendar.getInstance();
+	}
 
 	public int getId() {
 		return id;

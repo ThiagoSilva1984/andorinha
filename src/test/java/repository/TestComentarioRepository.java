@@ -283,53 +283,53 @@ public class TestComentarioRepository {
 	}
 
 	// Contar o total de comentários feito por um idUsuario
-	@Test
-	public void testa_contar_total_de_comentarios_por_idUsuario()
-			throws ErroAoconectarNaBaseException, ErroAoConsultarBaseException {
-		Comentario comentario = this.comentarioRepository.consultar(1); // vai dar o usuário de id 4
-
-		ComentarioSeletor seletor = new ComentarioSeletor();
-		seletor.setIdUsuario(comentario.getUsuario().getId());
-
-		long comentarios = this.comentarioRepository.contar(seletor);
-
-		assertThat(comentarios).isEqualTo(4);
-
-		System.out.println(comentarios);
-		System.out.println(comentario);
-	}
+//	@Test
+//	public void testa_contar_total_de_comentarios_por_idUsuario()
+//			throws ErroAoconectarNaBaseException, ErroAoConsultarBaseException {
+//		Comentario comentario = this.comentarioRepository.consultar(1); // vai dar o usuário de id 4
+//
+//		ComentarioSeletor seletor = new ComentarioSeletor();
+//		seletor.setIdUsuario(comentario.getUsuario().getId());
+//
+//		long comentarios = this.comentarioRepository.contar(seletor);
+//
+//		assertThat(comentarios).isEqualTo(4);
+//
+//		System.out.println(comentarios);
+//		System.out.println(comentario);
+//	}
 
 	// testa contar comentarios por data
-	@Test
-	public void testa_contar_total_de_comentarios_por_data()
-			throws ErroAoconectarNaBaseException, ErroAoConsultarBaseException {
-		Comentario comentario = this.comentarioRepository.consultar(1); // vai dar o usuário de id 4
-
-		ComentarioSeletor seletor = new ComentarioSeletor();
-		seletor.setDataPostagem(comentario.getDataPostagem());
-
-		long comentarios = this.comentarioRepository.contar(seletor);
-
-		assertThat(comentarios).isEqualTo(1);
-
-		System.out.println(comentarios);
-		System.out.println(comentario);
-	}
+//	@Test
+//	public void testa_contar_total_de_comentarios_por_data()
+//			throws ErroAoconectarNaBaseException, ErroAoConsultarBaseException {
+//		Comentario comentario = this.comentarioRepository.consultar(1); // vai dar o usuário de id 4
+//
+//		ComentarioSeletor seletor = new ComentarioSeletor();
+//		seletor.setDataPostagem(comentario.getDataPostagem());
+//
+//		long comentarios = this.comentarioRepository.contar(seletor);
+//
+//		assertThat(comentarios).isEqualTo(1);
+//
+//		System.out.println(comentarios);
+//		System.out.println(comentario);
+//	}
 
 	// testa contar comentarios por idTweet
-	@Test
-	public void testa_contar_total_de_comentarios_por_id_tweet()
-			throws ErroAoconectarNaBaseException, ErroAoConsultarBaseException {
-		Comentario comentario = this.comentarioRepository.consultar(1); // vai dar o usuário de id 4
-
-		ComentarioSeletor seletor = new ComentarioSeletor();
-		seletor.setIdTweet(comentario.getTweet().getId());
-
-		long comentarios = this.comentarioRepository.contar(seletor);
-
-		// assertThat( comentarios ).isEqualTo(1);
-
-		System.out.println(comentarios);
-	}
+//	@Test
+//	public void testa_contar_total_de_comentarios_por_id_tweet()
+//			throws ErroAoconectarNaBaseException, ErroAoConsultarBaseException {
+//		Comentario comentario = this.comentarioRepository.consultar(1); // vai dar o usuário de id 4
+//
+//		ComentarioSeletor seletor = new ComentarioSeletor();
+//		seletor.setIdTweet(comentario.getTweet().getId());
+//
+//		long comentarios = this.comentarioRepository.contar(seletor);
+//
+//		// assertThat( comentarios ).isEqualTo(1);
+//
+//		System.out.println(comentarios);
+//	}
 
 }
